@@ -31,26 +31,47 @@ export function LoginModal({ isOpen, onClose, onSuccess }: LoginModalProps) {
         await signInWithEmail(email, password);
       }
 
-      // Wait for data fetch
-      await refetch('from modal');
+      await refetch();
       onSuccess();
       onClose();
-    } catch (error) {
-      setError('Failed to sign in. Please check your credentials.');
+    } catch (error: any) {
+      if (error.code === 'auth/invalid-email') {
+        setError('Invalid email format. Please provide a valid email address.');
+      } else if (error.code === 'auth/user-disabled') {
+        setError('This account has been disabled. Please contact support.');
+      } else if (error.code === 'auth/user-not-found') {
+        setError('No user found with this email. Please sign up first.');
+      } else if (error.code === 'auth/wrong-password') {
+        setError('Incorrect password. Please try again.');
+      } else if (error.code === 'auth/email-already-in-use') {
+        setError('This email is already in use. Please sign in or use a different email.');
+      } else if (error.code === 'auth/weak-password') {
+        setError('Password is too weak. Please use at least 6 characters.');
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
     } finally {
       setIsAuthenticating(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
+    setError('');
     setIsAuthenticating(true);
+
     try {
       await signInWithGoogle();
-      await refetch('from modal');
+      await refetch();
       onSuccess();
       onClose();
-    } catch (error) {
-      setError('Failed to sign in with Google.');
+    } catch (error: any) {
+      if (error.code === 'auth/popup-closed-by-user') {
+        setError('Sign-in popup was closed before completing the sign-in process.');
+      } else if (error.code === 'auth/network-request-failed') {
+        setError('Network error. Please check your internet connection and try again.');
+      } else {
+        setError('Failed to sign in with Google. Please try again.');
+      }
     } finally {
       setIsAuthenticating(false);
     }
