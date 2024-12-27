@@ -7,7 +7,7 @@ export function useResumeUpload() {
   const [selectedRole, setSelectedRole] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -24,11 +24,6 @@ export function useResumeUpload() {
   const handleSubmit = async () => {
     if (!selectedFile || !selectedRole) return;
 
-    if (!user) {
-      setShowLoginModal(true);
-      return;
-    }
-
     setIsLoading(true);
     setError(null);
 
@@ -36,7 +31,11 @@ export function useResumeUpload() {
       const formData = new FormData();
       formData.append('resume', selectedFile);
       formData.append('roles', JSON.stringify([selectedRole]));
-      formData.append('user_id', user.uid);
+
+      // If user is logged in, include their ID
+      if (user) {
+        formData.append('user_id', user.uid);
+      }
 
       const response = await fetch(
         'https://bm7cr2dasm.ap-south-1.awsapprunner.com/analyze-resume',
@@ -50,24 +49,36 @@ export function useResumeUpload() {
         throw new Error('Failed to analyze resume. Please try again.');
       }
 
-      // After successful upload, fetch the latest data
-      const atsResponse = await fetch(
-        `https://bm7cr2dasm.ap-south-1.awsapprunner.com/ats-response/${user.uid}`
-      );
+      const analysisData = await response.json();
 
-      if (!atsResponse.ok) {
-        throw new Error('Failed to fetch analysis results.');
+      // Store analysis in localStorage
+      localStorage.setItem('resumeAnalysis', JSON.stringify(analysisData));
+      // If user is logged in, fetch their data
+      if (user) {
+        const atsResponse = await fetch(
+          `https://bm7cr2dasm.ap-south-1.awsapprunner.com/ats-response/${user.uid}`
+        );
+
+        if (!atsResponse.ok) {
+          throw new Error('Failed to fetch analysis results.');
+        }
+
+        const atsData = await atsResponse.json();
+        localStorage.setItem(
+          'resumeAnalysis',
+          JSON.stringify(atsData.response_data)
+        );
+        localStorage.removeItem('jobsData');
       }
 
-      const atsData = await atsResponse.json();
-
-      localStorage.setItem(
-        'resumeAnalysis',
-        JSON.stringify(atsData.response_data)
-      );
-      localStorage.removeItem('jobsData');
-
       navigate('/analysis');
+
+      // Show upgrade modal after a delay if user is not logged in
+      if (!user) {
+        setTimeout(() => {
+          setShowUpgradeModal(true);
+        }, 2000);
+      }
     } catch (error) {
       console.error('Error processing resume:', error);
       setError(
@@ -83,8 +94,8 @@ export function useResumeUpload() {
     selectedRole,
     isLoading,
     error,
-    showLoginModal,
-    setShowLoginModal,
+    showUpgradeModal,
+    setShowUpgradeModal,
     handleFileUpload,
     handleRoleSelect,
     handleSubmit,

@@ -12,48 +12,56 @@ import { LoadingExperience } from '../components/LoadingExperience';
 import { LoginModal } from '../components/auth/LoginModal';
 import { LoginButton } from '../components/auth/LoginButton';
 import { Toast } from '../components/Toast';
+import { UpgradeModal } from '../components/UpgradeModal';
 import { useAuth } from '../contexts/AuthContext';
 
 export function UploadPage() {
   const { user } = useAuth();
-  const { 
-    handleFileUpload, 
-    handleRoleSelect, 
+  const {
+    handleFileUpload,
+    handleRoleSelect,
     handleSubmit,
     selectedFile,
     selectedRole,
     isLoading,
     error,
-    showLoginModal,
-    showToast,
-    setShowLoginModal,
-    setShowToast
+    showUpgradeModal,
+    setShowUpgradeModal,
   } = useResumeUpload();
+
+  const [showLoginModal, setShowLoginModal] = React.useState(false);
+  const [showToast, setShowToast] = React.useState(false);
+
+  const handleUpgrade = () => {
+    setShowUpgradeModal(false);
+    setShowLoginModal(true);
+  };
 
   return (
     <>
-      {/* Loading Experience */}
       {isLoading && <LoadingExperience />}
-      
-      {/* Toast Notification */}
+
       <Toast
-        message="Please check back after a few minutes for your curated jobs and in-depth analysis!"
+        message="Analysis complete! Scroll down to see your results."
         isVisible={showToast}
         onClose={() => setShowToast(false)}
       />
-      
-      {/* Login Modal */}
-      <LoginModal 
+
+      <LoginModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
         onSuccess={handleSubmit}
       />
 
-      {/* Login Button */}
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        onUpgrade={handleUpgrade}
+      />
+
       {!user && <LoginButton onClick={() => setShowLoginModal(true)} />}
-      
+
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-        {/* Hero Section */}
         <div className="w-full bg-white/40 backdrop-blur-sm py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
@@ -65,15 +73,15 @@ export function UploadPage() {
                 ChumaOruWorks AI Resume Analyzer
               </h1>
               <p className="text-xl text-gray-700 leading-relaxed">
-                Analyze your resume with the power of AI to stand out in the competition. 
-                Find matching jobs instantly, saving hours of time and boosting your career transition.
+                Analyze your resume with the power of AI to stand out in the
+                competition. Find matching jobs instantly, saving hours of time
+                and boosting your career transition.
               </p>
             </motion.div>
           </div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          {/* Upload Section */}
           <section className="mb-32">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -81,18 +89,26 @@ export function UploadPage() {
               transition={{ delay: 0.2 }}
               className="max-w-2xl mx-auto bg-white/80 backdrop-blur-lg rounded-2xl p-8 shadow-xl border border-white/20"
             >
-              <ResumeUpload onFileUpload={handleFileUpload} selectedFile={selectedFile} />
-              
+              <ResumeUpload
+                onFileUpload={handleFileUpload}
+                selectedFile={selectedFile}
+              />
+
               <div className="my-8 relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-200"></div>
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="bg-white/80 px-4 text-sm text-gray-500">and</span>
+                  <span className="bg-white/80 px-4 text-sm text-gray-500">
+                    and
+                  </span>
                 </div>
               </div>
 
-              <RoleSelect onRoleSelect={handleRoleSelect} selectedRole={selectedRole} />
+              <RoleSelect
+                onRoleSelect={handleRoleSelect}
+                selectedRole={selectedRole}
+              />
 
               {error && (
                 <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600">
@@ -106,9 +122,11 @@ export function UploadPage() {
                 onClick={handleSubmit}
                 disabled={!selectedFile || !selectedRole || isLoading}
                 className={`w-full mt-8 flex items-center justify-center gap-2 px-6 py-4 rounded-xl text-white font-semibold transition-all text-lg
-                  ${(!selectedFile || !selectedRole || isLoading)
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700'}`}
+                  ${
+                    !selectedFile || !selectedRole || isLoading
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-blue-600 hover:bg-blue-700'
+                  }`}
               >
                 <FileUp className="w-6 h-6" />
                 Analyze Resume
@@ -116,7 +134,6 @@ export function UploadPage() {
             </motion.div>
           </section>
 
-          {/* Features Section */}
           <section className="mb-32">
             <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
               Why Choose Our AI Resume Analyzer?
@@ -124,7 +141,6 @@ export function UploadPage() {
             <InfiniteMarquee />
           </section>
 
-          {/* Statistics Section */}
           <section className="mb-32">
             <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
               Proven Results
@@ -132,7 +148,6 @@ export function UploadPage() {
             <StatisticsSection />
           </section>
 
-          {/* Testimonials Section */}
           <section className="mb-32">
             <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
               What Our Users Say

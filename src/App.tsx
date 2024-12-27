@@ -37,21 +37,16 @@ export default function App() {
         <Layout>
           <Routes>
             <Route path="/" element={<UploadPage />} />
-            <Route 
-              path="/analysis" 
-              element={
-                <PrivateRoute>
-                  <AnalysisPage />
-                </PrivateRoute>
-              } 
-            />
-            <Route 
-              path="/jobs" 
+            {/* Analysis page is now publicly accessible */}
+            <Route path="/analysis" element={<AnalysisPage />} />
+            {/* Jobs page remains protected */}
+            <Route
+              path="/jobs"
               element={
                 <PrivateRoute>
                   <JobsPage />
                 </PrivateRoute>
-              } 
+              }
             />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
