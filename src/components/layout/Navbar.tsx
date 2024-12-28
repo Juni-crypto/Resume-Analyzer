@@ -9,9 +9,12 @@ import {
   User,
   Menu,
   X,
+  Book,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useReportStatus } from '../../hooks/useReportStatus';
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
 
 export function Navbar() {
   const { user, logout } = useAuth();
@@ -20,33 +23,41 @@ export function Navbar() {
   const { hasReport, hasJobs, isLoading } = useReportStatus();
 
   const navItems = [
-    { path: '/', label: 'Analyze Resume', icon: FileText, alwaysShow: true },
+    {
+      path: '/',
+      label: 'Analyze Resume',
+      icon: FileText,
+      alwaysShow: true,
+      tooltip: 'Please submit your resume for analysis.',
+    },
     {
       path: '/analysis',
       label: 'Your Analysis',
       icon: BarChart2,
       requiresReport: true,
+      tooltip:
+        'Please wait for your analysis or resubmit your resume if new-user.',
     },
     {
       path: '/jobs',
       label: 'Featured Jobs',
       icon: Briefcase,
       requiresJobs: true,
+      tooltip:
+        'Please wait for your analysis or resubmit your resume if new-user.',
+    },
+    {
+      path: '/blog',
+      label: 'Blog',
+      icon: Book,
+      alwaysShow: true,
     },
   ];
 
   if (!user) return null;
 
-  const filteredNavItems = navItems.filter(
-    (item) =>
-      item.alwaysShow ||
-      (item.requiresReport && hasReport) ||
-      (item.requiresJobs && hasJobs)
-  );
-
   return (
     <>
-      {/* Mobile Menu Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-white shadow-lg md:hidden"
@@ -54,7 +65,6 @@ export function Navbar() {
         {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
       </button>
 
-      {/* Sidebar */}
       <div
         className={`fixed top-0 left-0 h-screen bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out z-40 w-64
           ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
@@ -87,36 +97,49 @@ export function Navbar() {
               </div>
             ) : (
               <ul className="space-y-2">
-                {filteredNavItems.map((item) => {
+                {navItems.map((item) => {
                   const isActive = location.pathname === item.path;
                   const Icon = item.icon;
+                  const isDisabled =
+                    (item.requiresReport && !hasReport) ||
+                    (item.requiresJobs && !hasJobs);
 
                   return (
                     <li key={item.path}>
-                      <Link
-                        to={item.path}
-                        onClick={() => setIsOpen(false)}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors relative ${
-                          isActive
-                            ? 'text-blue-600'
-                            : 'text-gray-600 hover:text-blue-600'
-                        }`}
+                      <Tippy
+                        content={isDisabled ? item.tooltip : ''}
+                        disabled={!isDisabled}
                       >
-                        {isActive && (
-                          <motion.div
-                            layoutId="active-nav"
-                            className="absolute inset-0 bg-blue-50 rounded-xl"
-                            initial={false}
-                            transition={{
-                              type: 'spring',
-                              stiffness: 500,
-                              damping: 30,
-                            }}
-                          />
-                        )}
-                        <Icon className="w-5 h-5 relative z-10" />
-                        <span className="relative z-10">{item.label}</span>
-                      </Link>
+                        <Link
+                          to={item.path}
+                          className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors relative cursor-pointer
+                            ${
+                              isDisabled
+                                ? 'text-gray-400'
+                                : 'text-gray-600 hover:text-blue-600'
+                            }`}
+                          onClick={() => {
+                            if (!isDisabled) {
+                              setIsOpen(false);
+                            }
+                          }}
+                        >
+                          {isActive && !isDisabled && (
+                            <motion.div
+                              layoutId="active-nav"
+                              className="absolute inset-0 bg-blue-50 rounded-xl"
+                              initial={false}
+                              transition={{
+                                type: 'spring',
+                                stiffness: 500,
+                                damping: 30,
+                              }}
+                            />
+                          )}
+                          <Icon className="w-5 h-5 relative z-10" />
+                          <span className="relative z-10">{item.label}</span>
+                        </Link>
+                      </Tippy>
                     </li>
                   );
                 })}
@@ -134,7 +157,6 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Overlay for mobile */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30 md:hidden"

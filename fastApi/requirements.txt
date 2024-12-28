@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pandas
+python-jobspy
+google-generativeai
+pydantic
+python-multipart
+boto3

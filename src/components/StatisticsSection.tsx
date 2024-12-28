@@ -7,27 +7,27 @@ const stats = [
   {
     icon: TrendingUp,
     value: 85,
-    label: "Success Rate",
-    description: "of our users land interviews"
+    label: 'Success Rate',
+    description: 'of our users land interviews',
   },
   {
     icon: Users,
-    value: 50000,
-    label: "Active Users",
-    description: "trust our platform"
+    value: 110,
+    label: 'Active Users',
+    description: 'In just Launch of 3 days',
   },
   {
     icon: Clock,
     value: 95,
-    label: "Time Saved",
-    description: "average time reduction in job search"
+    label: 'Time Saved',
+    description: 'average time reduction in job search',
   },
   {
     icon: Award,
     value: 92,
-    label: "Match Rate",
-    description: "accurate job recommendations"
-  }
+    label: 'Match Rate',
+    description: 'accurate job recommendations',
+  },
 ];
 
 export function StatisticsSection() {
@@ -50,9 +50,13 @@ export function StatisticsSection() {
               <div>
                 <div className="text-3xl font-bold text-gray-800">
                   <AnimatedCounter end={stat.value} />
-                  {typeof stat.value === 'number' && stat.value <= 100 ? '%' : '+'}
+                  {typeof stat.value === 'number' && stat.value <= 100
+                    ? '%'
+                    : '+'}
                 </div>
-                <p className="text-sm font-medium text-gray-600">{stat.label}</p>
+                <p className="text-sm font-medium text-gray-600">
+                  {stat.label}
+                </p>
                 <p className="text-xs text-gray-500 mt-1">{stat.description}</p>
               </div>
             </div>
