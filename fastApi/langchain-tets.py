@@ -22,9 +22,9 @@ import boto3
 from botocore.exceptions import ClientError
 
 boto3.setup_default_session(
-    aws_access_key_id='AKIAU7TSHLGWRPJY7R7R',
-    aws_secret_access_key='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',
-    region_name='ap-south-1'  # Default to 'ap-south-1' if not set
+    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+    region_name=os.getenv('AWS_REGION')  # Default to 'ap-south-1' if not set
 )
 # Initialize DynamoDB client
 dynamodb = boto3.resource('dynamodb')
@@ -37,7 +37,7 @@ sharable_resumes_table = dynamodb.Table('SharableResumes')
 # === End Added ===
 
 # === Configure GenAI Client ===
-GENAI_API_KEY = 'AIzaSyCk54G_fA22wzu96SyFPKWsWLisxzF4vzQ'
+GENAI_API_KEY = os.getenv('GENAI_API_KEY')
 genai.configure(api_key=GENAI_API_KEY)
 
 # === Initialize FastAPI App ===
