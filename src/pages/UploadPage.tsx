@@ -11,9 +11,9 @@ import { Footer } from '../components/Footer';
 import { LoadingExperience } from '../components/LoadingExperience';
 import { LoginModal } from '../components/auth/LoginModal';
 import { LoginButton } from '../components/auth/LoginButton';
+import { Toast } from '../components/Toast';
 import { UpgradeModal } from '../components/UpgradeModal';
 import { useAuth } from '../contexts/AuthContext';
-import { BlogSection } from '../components/BlogSection';
 
 export function UploadPage() {
   const { user } = useAuth();
@@ -30,6 +30,7 @@ export function UploadPage() {
   } = useResumeUpload();
 
   const [showLoginModal, setShowLoginModal] = React.useState(false);
+  const [showToast, setShowToast] = React.useState(false);
 
   const handleUpgrade = () => {
     setShowUpgradeModal(false);
@@ -39,6 +40,12 @@ export function UploadPage() {
   return (
     <>
       {isLoading && <LoadingExperience />}
+
+      <Toast
+        message="Analysis complete! Scroll down to see your results."
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+      />
 
       <LoginModal
         isOpen={showLoginModal}
@@ -146,13 +153,6 @@ export function UploadPage() {
               What Our Users Say
             </h2>
             <TestimonialsMarquee />
-          </section>
-
-          <section className="mb-32">
-            <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-              Learn About ATS
-            </h2>
-            <BlogSection />
           </section>
         </div>
 

@@ -36,7 +36,6 @@ export function AnalysisPage() {
   const { data: roleData, name: roleName, profile } = selectedRole;
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showToast, setShowToast] = useState(false);
 
   const handleUpgrade = () => {
     setShowUpgradeModal(false);
@@ -50,11 +49,11 @@ export function AnalysisPage() {
       <div className="relative">
         <div className="absolute inset-0 bg-gray-100/80 backdrop-blur-sm flex items-center justify-center z-10 rounded-2xl">
           <button
-            onClick={() => setShowLoginModal(true)}
+            onClick={() => setShowUpgradeModal(true)}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Lock className="w-4 h-4" />
-            Login to Unlock
+            Unlock Feature
           </button>
         </div>
         {children}
@@ -64,13 +63,6 @@ export function AnalysisPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
-      {/* <Toast
-        message={user ? "Analysis complete! Your curated results are ready." : "Please log in to view detailed analysis and insights."}
-        isVisible={showToast}
-        onClose={() => setShowToast(false)}
-        type={user ? "success" : "error"}
-      /> */}
-
       <UpgradeModal
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
@@ -80,9 +72,7 @@ export function AnalysisPage() {
       <LoginModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
-        onSuccess={() => {
-          setShowToast(true);
-        }}
+        onSuccess={() => {}}
       />
 
       <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
