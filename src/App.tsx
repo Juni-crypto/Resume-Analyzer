@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { UploadPage } from './pages/UploadPage';
+import { PortfolioPage } from './pages/PortfolioPage.tsx';
 import { AnalysisPage } from './pages/AnalysisPage';
 import { JobsPage } from './pages/JobsPage';
 import { BlogListPage } from './pages/BlogListPage';
@@ -41,6 +42,7 @@ export default function App() {
             <Route path="/analysis" element={<AnalysisPage />} />
             <Route path="/blog" element={<BlogListPage />} />
             <Route path="/blog/:slug" element={<BlogPage />} />
+            <Route path="/portfolio" element={<PortfolioPage />} />
             <Route
               path="/jobs"
               element={

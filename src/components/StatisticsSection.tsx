@@ -7,8 +7,8 @@ const stats = [
   {
     icon: TrendingUp,
     value: 85,
-    label: 'Success Rate',
-    description: 'of our users land interviews',
+    label: "Success Rate",
+    description: "of our users land interviews"
   },
   {
     icon: Users,
@@ -50,13 +50,9 @@ export function StatisticsSection() {
               <div>
                 <div className="text-3xl font-bold text-gray-800">
                   <AnimatedCounter end={stat.value} />
-                  {typeof stat.value === 'number' && stat.value <= 100
-                    ? '%'
-                    : '+'}
+                  {typeof stat.value === 'number' && stat.value <= 100 ? '%' : '+'}
                 </div>
-                <p className="text-sm font-medium text-gray-600">
-                  {stat.label}
-                </p>
+                <p className="text-sm font-medium text-gray-600">{stat.label}</p>
                 <p className="text-xs text-gray-500 mt-1">{stat.description}</p>
               </div>
             </div>

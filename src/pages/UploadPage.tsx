@@ -11,6 +11,7 @@ import { Footer } from '../components/Footer';
 import { LoadingExperience } from '../components/LoadingExperience';
 import { LoginModal } from '../components/auth/LoginModal';
 import { LoginButton } from '../components/auth/LoginButton';
+import { Toast } from '../components/Toast';
 import { UpgradeModal } from '../components/UpgradeModal';
 import { useAuth } from '../contexts/AuthContext';
 import { BlogSection } from '../components/BlogSection';
@@ -26,7 +27,11 @@ export function UploadPage() {
     isLoading,
     error,
     showUpgradeModal,
+    showSuccessToast,
+    showErrorToast,
     setShowUpgradeModal,
+    setShowSuccessToast,
+    setShowErrorToast,
   } = useResumeUpload();
 
   const [showLoginModal, setShowLoginModal] = React.useState(false);
@@ -39,6 +44,22 @@ export function UploadPage() {
   return (
     <>
       {isLoading && <LoadingExperience />}
+
+      {user ? (
+        <Toast
+          message="Analysis complete! Your curated jobs will be available shortly."
+          isVisible={showSuccessToast}
+          onClose={() => setShowSuccessToast(false)}
+          type="success"
+        />
+      ) : (
+        <Toast
+          message="To get more detailed analysis and curated jobs, please login and resubmit your resume for analysis."
+          isVisible={showErrorToast}
+          onClose={() => setShowErrorToast(false)}
+          type="error"
+        />
+      )}
 
       <LoginModal
         isOpen={showLoginModal}
