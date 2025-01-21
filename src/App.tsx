@@ -1,15 +1,17 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { UploadPage } from './pages/UploadPage';
 import { PortfolioPage } from './pages/PortfolioPage.tsx';
 import { AnalysisPage } from './pages/AnalysisPage';
 import { JobsPage } from './pages/JobsPage';
 import { BlogListPage } from './pages/BlogListPage';
+import { PublicResumePage } from './pages/PublicResumePage';
 import { BlogPage } from './pages/BlogPage';
 import { Navbar } from './components/layout/Navbar';
 import { useAuth } from './contexts/AuthContext';
 import { useAuthData } from './hooks/useAuthData';
 import { LoadingExperience } from './components/LoadingExperience';
+import { SharableResume } from './components/portfolio/SharableResume';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
@@ -19,14 +21,18 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 function Layout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const { isLoading, isInitialized } = useAuthData();
+  const location = useLocation();
 
-  if (!isInitialized || isLoading) {
+  // Don't show loading screen or navbar on public resume page
+  const isPublicResume = location.pathname.startsWith('/resume/');
+  
+  if (!isPublicResume && (!isInitialized || isLoading)) {
     return <LoadingExperience />;
   }
 
   return (
-    <div className={`${user ? 'md:pl-64' : ''} transition-all duration-300`}>
-      {user && <Navbar />}
+    <div className={`${user && !isPublicResume ? 'md:pl-64' : ''} transition-all duration-300`}>
+      {user && !isPublicResume && <Navbar />}
       {children}
     </div>
   );
@@ -43,6 +49,7 @@ export default function App() {
             <Route path="/blog" element={<BlogListPage />} />
             <Route path="/blog/:slug" element={<BlogPage />} />
             <Route path="/portfolio" element={<PortfolioPage />} />
+            <Route path="/resume/:userId" element={<PublicResumePage />} />
             <Route
               path="/jobs"
               element={
