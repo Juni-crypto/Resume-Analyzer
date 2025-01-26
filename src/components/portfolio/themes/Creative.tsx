@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import {
   Mail,
   Phone,
   MapPin,
-  Moon,
-  Sun,
   Github,
   Linkedin,
   Briefcase,
@@ -16,30 +14,19 @@ import {
 } from 'lucide-react';
 import { getSocialLink, getContactLink, getWorkTogetherSection } from '../../../utils/contactHelpers';
 
-export function Creative({ data }: { data: any }) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+export function Creative({ data, isDarkMode }: { data: any; isDarkMode: boolean }) {
   const { sharable_resume: resume } = data;
 
   const gradientClasses = isDarkMode
-    ? 'from-purple-900 via-indigo-900 to-blue-900'
-    : 'from-purple-100 via-indigo-100 to-blue-100';
+    ? 'from-indigo-900 via-purple-900 to-blue-900 text-gray-100'
+    : 'from-indigo-50 via-purple-50 to-blue-50 text-gray-900';
 
   return (
     <div
       className={`min-h-screen transition-colors duration-300 ${
-        isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'
+        isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'
       }`}
     >
-      {/* Theme Toggle */}
-      <button
-        onClick={() => setIsDarkMode(!isDarkMode)}
-        className={`fixed top-4 right-4 p-3 rounded-full ${
-          isDarkMode ? 'bg-gray-800 text-yellow-400' : 'bg-white text-gray-700'
-        } shadow-lg z-50`}
-      >
-        {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-      </button>
-
       {/* Header */}
       <header className={`bg-gradient-to-r ${gradientClasses} py-20`}>
         <div className="max-w-6xl mx-auto px-8">

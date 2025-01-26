@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import {
   Mail,
   Phone,
   MapPin,
-  Moon,
-  Sun,
   Github,
   Linkedin,
   Briefcase,
@@ -13,45 +11,47 @@ import {
   Award,
   Code2,
   Rocket,
-  User,
   Link as LinkIcon,
 } from 'lucide-react';
 import { getSocialLink, getContactLink, getWorkTogetherSection } from '../../../utils/contactHelpers';
 
-export function Bento({ data }: { data: any }) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+export function Bento({ data, isDarkMode }: { data: any; isDarkMode: boolean }) {
   const { sharable_resume: resume } = data;
 
   const bentoItemClass = `${
-    isDarkMode ? 'bg-gray-800' : 'bg-white'
-  } rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-lg border border-white/20`;
+    isDarkMode ? 'bg-gray-800/90 text-gray-100' : 'bg-white/90 text-gray-900'
+  } rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-lg border ${
+    isDarkMode ? 'border-gray-700' : 'border-gray-200'
+  } hover:scale-[1.02]`;
 
   return (
     <div
       className={`min-h-screen transition-colors duration-300 ${
-        isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-black'
-      }`}
+        isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'
+      } relative`}
     >
-      {/* Theme Toggle */}
-      <button
-        onClick={() => setIsDarkMode(!isDarkMode)}
-        className={`fixed top-4 right-4 p-3 rounded-full ${
-          isDarkMode ? 'bg-gray-800 text-yellow-400' : 'bg-white text-gray-900'
-        } shadow-lg z-50`}
-      >
-        {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-      </button>
+      {/* Grid Background */}
+      <div className="absolute inset-0 bg-grid-pattern opacity-[0.2]" 
+           style={{
+             backgroundImage: `linear-gradient(to right, ${isDarkMode ? '#ffffff10' : '#00000010'} 1px, transparent 1px),
+                              linear-gradient(to bottom, ${isDarkMode ? '#ffffff10' : '#00000010'} 1px, transparent 1px)`,
+             backgroundSize: '24px 24px'
+           }} 
+      />
 
-      <div className="max-w-7xl mx-auto p-8">
+      <div className="max-w-7xl mx-auto p-8 relative">
         {/* Header - Large Bento Box */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`${bentoItemClass} mb-8`}
+          className={`${bentoItemClass} mb-8 relative overflow-hidden`}
         >
-          <div className="flex flex-col md:flex-row items-center gap-8">
-            <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
-              <User className="w-16 h-16 text-white" />
+          <div className="absolute -right-20 -top-20 w-40 h-40 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full blur-3xl" />
+          <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
+            <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center transform rotate-3 hover:rotate-0 transition-all duration-300">
+              <span className="text-4xl font-bold text-white">
+                {resume.name.split(' ').map(n => n[0]).join('')}
+              </span>
             </div>
             <div className="flex-1 text-center md:text-left">
               <h1 className="text-4xl font-bold mb-4">{resume.name}</h1>
@@ -68,27 +68,29 @@ export function Bento({ data }: { data: any }) {
           </div>
         </motion.div>
 
-        {/* Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* Summary */}
+        {/* Grid Layout with improved gap and animations */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
+          {/* Summary with decorative elements */}
           {resume.summary && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`${bentoItemClass} lg:col-span-2`}
+              className={`${bentoItemClass} lg:col-span-2 relative overflow-hidden group`}
             >
+              <div className="absolute -right-20 -bottom-20 w-40 h-40 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700" />
               <h2 className="text-2xl font-bold mb-4">About Me</h2>
               <p className="leading-relaxed">{resume.summary}</p>
             </motion.div>
           )}
 
-          {/* Skills */}
+          {/* Skills with improved visual hierarchy */}
           {resume.skills?.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className={bentoItemClass}
+              className={`${bentoItemClass} relative overflow-hidden`}
             >
+              <div className="absolute -left-20 -top-20 w-40 h-40 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl" />
               <div className="flex items-center gap-2 mb-4">
                 <Code2 className="w-6 h-6 text-blue-500" />
                 <h2 className="text-2xl font-bold">Skills</h2>
@@ -100,11 +102,11 @@ export function Bento({ data }: { data: any }) {
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: index * 0.05 }}
-                    className={`px-3 py-1 rounded-lg text-sm ${
+                    className={`px-3 py-1 rounded-lg text-sm border ${
                       isDarkMode
-                        ? 'bg-gray-700 text-gray-100'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}
+                        ? 'bg-gray-700/50 border-gray-600 text-gray-100'
+                        : 'bg-gray-50/50 border-gray-200 text-gray-800'
+                    } hover:border-blue-500 transition-colors duration-300`}
                   >
                     {skill}
                   </motion.span>
@@ -279,9 +281,16 @@ export function Bento({ data }: { data: any }) {
           )}
         </div>
 
-        {/* Work Together Section */}
-        <section className="mt-16">
-          {getWorkTogetherSection(resume.email, resume.name, isDarkMode)}
+        {/* Work Together Section with enhanced styling */}
+        <section className="mt-16 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`${bentoItemClass} text-center relative overflow-hidden`}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 opacity-50" />
+            {getWorkTogetherSection(resume.email, resume.name, isDarkMode)}
+          </motion.div>
         </section>
       </div>
     </div>

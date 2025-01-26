@@ -12,6 +12,7 @@ import { useAuth } from './contexts/AuthContext';
 import { useAuthData } from './hooks/useAuthData';
 import { LoadingExperience } from './components/LoadingExperience';
 import { SharableResume } from './components/portfolio/SharableResume';
+import { useScrollToTop } from './hooks/useScrollToTop';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
@@ -22,6 +23,7 @@ function Layout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const { isLoading, isInitialized } = useAuthData();
   const location = useLocation();
+  useScrollToTop(); // Add this line here
 
   // Don't show loading screen or navbar on public resume page
   const isPublicResume = location.pathname.startsWith('/resume/');

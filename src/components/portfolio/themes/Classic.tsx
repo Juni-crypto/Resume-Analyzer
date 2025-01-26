@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import {
   Briefcase,
@@ -6,8 +6,6 @@ import {
   Mail,
   Phone,
   MapPin,
-  Moon,
-  Sun,
   Award,
   Code2,
   ExternalLink,
@@ -16,9 +14,14 @@ import {
 } from 'lucide-react';
 import { getSocialLink, getContactLink, getWorkTogetherSection } from '../../../utils/contactHelpers';
 
-export function Classic({ data }: { data: any }) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+export function Classic({ data, isDarkMode }: { data: any; isDarkMode: boolean }) {
   const { sharable_resume: resume } = data;
+
+  const sectionClass = `${
+    isDarkMode 
+      ? 'bg-gray-800 text-gray-100 border-gray-700' 
+      : 'bg-white text-gray-900 border-gray-200'
+  } border rounded-lg shadow-lg p-6`;
 
   return (
     <div
@@ -26,16 +29,6 @@ export function Classic({ data }: { data: any }) {
         isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'
       }`}
     >
-      {/* Theme Toggle */}
-      <button
-        onClick={() => setIsDarkMode(!isDarkMode)}
-        className={`fixed top-4 right-4 p-3 rounded-full ${
-          isDarkMode ? 'bg-gray-800 text-yellow-400' : 'bg-white text-gray-700'
-        } shadow-lg z-50`}
-      >
-        {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-      </button>
-
       <div className="max-w-5xl mx-auto p-8">
         {/* Header */}
         <header className={`${
@@ -68,9 +61,7 @@ export function Classic({ data }: { data: any }) {
           <div className="lg:col-span-2 space-y-8">
             {/* Summary */}
             {resume.summary && (
-              <section className={`${
-                isDarkMode ? 'bg-gray-800' : 'bg-white'
-              } rounded-lg shadow-lg p-6`}>
+              <section className={sectionClass}>
                 <h2 className="text-2xl font-bold mb-4">Professional Summary</h2>
                 <p className="leading-relaxed">{resume.summary}</p>
               </section>
@@ -78,9 +69,7 @@ export function Classic({ data }: { data: any }) {
 
             {/* Experience */}
             {resume.experience?.length > 0 && (
-              <section className={`${
-                isDarkMode ? 'bg-gray-800' : 'bg-white'
-              } rounded-lg shadow-lg p-6`}>
+              <section className={sectionClass}>
                 <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
                   <Briefcase className="w-6 h-6 text-blue-500" />
                   Experience
@@ -112,9 +101,7 @@ export function Classic({ data }: { data: any }) {
           <div className="space-y-8">
             {/* Skills */}
             {resume.skills?.length > 0 && (
-              <section className={`${
-                isDarkMode ? 'bg-gray-800' : 'bg-white'
-              } rounded-lg shadow-lg p-6`}>
+              <section className={sectionClass}>
                 <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
                   <Code2 className="w-6 h-6 text-blue-500" />
                   Skills
@@ -141,9 +128,7 @@ export function Classic({ data }: { data: any }) {
 
             {/* Education */}
             {resume.education?.length > 0 && (
-              <section className={`${
-                isDarkMode ? 'bg-gray-800' : 'bg-white'
-              } rounded-lg shadow-lg p-6`}>
+              <section className={sectionClass}>
                 <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
                   <GraduationCap className="w-6 h-6 text-blue-500" />
                   Education
@@ -167,9 +152,7 @@ export function Classic({ data }: { data: any }) {
 
             {/* Certifications */}
             {resume.certifications?.length > 0 && (
-              <section className={`${
-                isDarkMode ? 'bg-gray-800' : 'bg-white'
-              } rounded-lg shadow-lg p-6`}>
+              <section className={sectionClass}>
                 <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
                   <Award className="w-6 h-6 text-blue-500" />
                   Certifications
@@ -197,9 +180,7 @@ export function Classic({ data }: { data: any }) {
 
         {/* Projects */}
         {resume.projects?.length > 0 && (
-          <section className={`${
-            isDarkMode ? 'bg-gray-800' : 'bg-white'
-          } rounded-lg shadow-lg p-6 mt-8`}>
+          <section className={sectionClass}>
             <h2 className="text-2xl font-bold mb-6">Notable Projects</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {resume.projects.map((project: any, index: number) => (

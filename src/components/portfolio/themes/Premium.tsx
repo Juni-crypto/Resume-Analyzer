@@ -4,14 +4,14 @@ import {
   Award,
   Briefcase,
   Code2,
+  Github,
   GraduationCap,
+  Linkedin,
   Mail,
   MapPin,
   Phone,
   Rocket,
   Zap,
-  Moon,
-  Sun,
   Trophy,
 } from 'lucide-react';
 import { getSocialLink, getContactLink, getWorkTogetherSection } from '../../../utils/contactHelpers';
@@ -19,14 +19,18 @@ import { getSocialLink, getContactLink, getWorkTogetherSection } from '../../../
 export function Premium({ data, isDarkMode }: { data: any; isDarkMode: boolean }) {
   const { sharable_resume: resume } = data;
 
+  const cardClass = `${
+    isDarkMode 
+      ? 'bg-gray-800/80 border-gray-700 text-gray-100' 
+      : 'bg-white/80 border-white/20 text-gray-900'
+  } backdrop-blur-lg rounded-3xl p-6 shadow-xl border`;
+
   return (
-    <div
-      className={`min-h-screen transition-colors duration-300 ${
-        isDarkMode
-          ? 'bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 text-white'
-          : 'bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50'
-      }`}
-    >
+    <div className={`min-h-screen transition-colors duration-300 ${
+      isDarkMode 
+        ? 'bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900 text-gray-100'
+        : 'bg-gradient-to-br from-gray-50 via-purple-50 to-blue-50 text-gray-900'
+    }`}>
       <div className="max-w-7xl mx-auto p-6">
         {/* Header Section */}
         <motion.div
