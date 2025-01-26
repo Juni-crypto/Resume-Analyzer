@@ -47,17 +47,19 @@ export function UploadPage() {
 
       {user ? (
         <Toast
-          message="Analysis complete! Your curated jobs will be available shortly."
+          message="Analysis Complete! 🎉"
+          description="Your curated jobs are being prepared. You'll be redirected to view your detailed analysis shortly."
           isVisible={showSuccessToast}
           onClose={() => setShowSuccessToast(false)}
           type="success"
         />
       ) : (
         <Toast
-          message="To get more detailed analysis and curated jobs, please login and resubmit your resume for analysis."
+          message="Want More Insights? 🚀"
+          description="Sign in to unlock personalized job matches and detailed analysis of your resume."
           isVisible={showErrorToast}
           onClose={() => setShowErrorToast(false)}
-          type="error"
+          type="loading"
         />
       )}
 
