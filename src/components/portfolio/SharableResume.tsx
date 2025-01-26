@@ -9,13 +9,12 @@ interface SharableResumeProps {
   isDarkMode?: boolean;
 }
 
-export function SharableResume({ data, theme: propTheme, isDarkMode: propIsDarkMode }: SharableResumeProps) {
+export function SharableResume({ data, theme: propTheme, isDarkMode }: SharableResumeProps) {
   const [searchParams] = useSearchParams();
   const urlTheme = searchParams.get('theme') as ThemeName;
-  const theme = propTheme || urlTheme || 'modern';
-  const isDarkMode = propIsDarkMode ?? false;
+  const selectedTheme = propTheme || urlTheme || 'modern';
   
-  const ThemeComponent = themes[theme] || themes.modern;
+  const ThemeComponent = themes[selectedTheme] || themes.modern;
   
   return <ThemeComponent data={data} isDarkMode={isDarkMode} />;
 }
