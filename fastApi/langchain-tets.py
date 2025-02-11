@@ -720,6 +720,11 @@ async def analyze_resume(
     user_id: Optional[str] = Form(None, description="User ID for storing responses"),
     background_tasks: BackgroundTasks = None
 ):
+    print("=== Request Headers ===")
+    for header_name, header_value in request.headers.items():
+        print(f"{header_name}: {header_value}")
+    print("=====================")
+    
     global user_id_counter
     if user_id is None:
         user_id = f"testaccount-{user_id_counter:02d}"
@@ -756,7 +761,7 @@ async def analyze_resume(
         job_status[client_id] = {"status": "pending", "message": "Job search started"}
         
         # Get client IP and location
-        client_ip = request.client.host
+        client_ip = get_client_ip(request)
         user_location = get_location_from_ip(client_ip)
         
         background_tasks.add_task(do_job_search, list(ats_feedback.roles.keys()), client_id, user_id, user_location)
@@ -803,6 +808,19 @@ async def get_ats_response(user_id: str):
             status_code=500,
             detail=f"Database error: {str(e)}"
         )
+def get_client_ip(request: Request) -> str:
+    """
+    Gets the real client IP address from X-Forwarded-For header.
+    """
+    forwarded_for = request.headers.get('x-forwarded-for')
+    if forwarded_for:
+        # X-Forwarded-For can contain multiple IPs - take the first one
+        client_ip = forwarded_for.split(',')[0].strip()
+        print(f"Client IP from X-Forwarded-For: {client_ip}")
+        return client_ip
+    
+    # Fallback to direct client IP if header not present
+    return request.client.host
 
 @app.get("/job-data/{user_id}", response_model=JobDataGet)
 async def get_job_data(user_id: str):
