@@ -18,6 +18,7 @@ import { BlogSection } from '../components/BlogSection';
 import { PortfolioShowcase } from '../components/features/PortfolioShowcase';
 import { JobsPreview } from '../components/features/JobsPreview';
 
+
 export function UploadPage() {
   const { user } = useAuth();
   const {
@@ -37,6 +38,7 @@ export function UploadPage() {
   } = useResumeUpload();
 
   const [showLoginModal, setShowLoginModal] = React.useState(false);
+  const [showToast, setShowToast] = React.useState(false);
 
   const handleUpgrade = () => {
     setShowUpgradeModal(false);
@@ -64,6 +66,7 @@ export function UploadPage() {
           type="loading"
         />
       )}
+
 
       <LoginModal
         isOpen={showLoginModal}
@@ -208,13 +211,6 @@ export function UploadPage() {
               What Our Users Say
             </h2>
             <TestimonialsMarquee />
-          </section>
-
-          <section className="mb-32">
-            <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-              Learn About ATS
-            </h2>
-            <BlogSection />
           </section>
         </div>
 
