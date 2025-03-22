@@ -14,11 +14,7 @@ export function useAuthData() {
   const fetchingRef = useRef(false);
 
   const fetchUserData = async () => {
-    // Prevent concurrent fetches
-    if (fetchingRef.current) {
-      return;
-    }
-
+    if (fetchingRef.current) return;
     if (!user) {
       setIsLoading(false);
       return;
@@ -29,38 +25,36 @@ export function useAuthData() {
       setIsLoading(true);
       setError(null);
 
-      const [atsResponse, jobsResponse] = await Promise.all([
-        fetch(
-          `https://bm7cr2dasm.ap-south-1.awsapprunner.com/ats-response/${user.uid}`
-        ),
-        fetch(
-          `https://bm7cr2dasm.ap-south-1.awsapprunner.com/job-data/${user.uid}`
-        ),
+      const [atsResponse, jobsResponse, sharableResumeResponse] = await Promise.all([
+        fetch(`https://bm7cr2dasm.ap-south-1.awsapprunner.com/ats-response/${user.uid}`),
+        fetch(`https://bm7cr2dasm.ap-south-1.awsapprunner.com/job-data/${user.uid}`),
+        fetch(`https://bm7cr2dasm.ap-south-1.awsapprunner.com/sharable-resume/${user.uid}`)
       ]);
 
-      if (!atsResponse.ok || !jobsResponse.ok) {
+      if (!atsResponse.ok || !jobsResponse.ok || !sharableResumeResponse.ok) {
         throw new Error('Failed to fetch user data');
       }
 
-      const [atsData, jobsData] = await Promise.all([
+      const [atsData, jobsData, sharableResumeData] = await Promise.all([
         atsResponse.json(),
         jobsResponse.json(),
+        sharableResumeResponse.json()
       ]);
 
       if (atsData.response_data) {
-        localStorage.setItem(
-          'resumeAnalysis',
-          JSON.stringify(atsData.response_data)
-        );
+        localStorage.setItem('resumeAnalysis', JSON.stringify(atsData.response_data));
       }
 
       if (jobsData) {
         localStorage.setItem('jobsData', JSON.stringify({ jobs: jobsData }));
       }
+
+      if (sharableResumeData) {
+        localStorage.setItem('sharableResume', JSON.stringify(sharableResumeData));
+      }
+
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Failed to fetch user data'
-      );
+      setError(err instanceof Error ? err.message : 'Failed to fetch user data');
     } finally {
       setIsLoading(false);
       setIsInitialized(true);

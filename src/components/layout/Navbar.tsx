@@ -9,7 +9,8 @@ import {
   User,
   Menu,
   X,
-  Book,
+  Book, // Import the icon for the Blog section
+  Contact, // Import the icon for the Portfolio section
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useReportStatus } from '../../hooks/useReportStatus';
@@ -46,11 +47,21 @@ export function Navbar() {
       tooltip:
         'Please wait for your analysis or resubmit your resume if new-user.',
     },
+    // Add the Blog section
     {
       path: '/blog',
       label: 'Blog',
       icon: Book,
       alwaysShow: true,
+    },
+    {
+      path: '/portfolio',
+      label: 'Portfolio',
+      icon: Contact,
+      alwaysShow: true,
+      tooltip:
+      'Please wait for your analysis or resubmit your resume if new-user.',
+
     },
   ];
 
@@ -100,31 +111,44 @@ export function Navbar() {
                 {navItems.map((item) => {
                   const isActive = location.pathname === item.path;
                   const Icon = item.icon;
-                  const isDisabled =
-                    (item.requiresReport && !hasReport) ||
+                  const isDisabled = 
+                    (item.requiresReport && !hasReport) || 
                     (item.requiresJobs && !hasJobs);
+
+                  const commonClasses = `flex items-center gap-3 px-4 py-3 rounded-xl transition-colors relative ${
+                    isActive
+                      ? 'text-blue-600'
+                      : 'text-gray-600 hover:text-blue-600'
+                  } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`;
 
                   return (
                     <li key={item.path}>
-                      <Tippy
-                        content={isDisabled ? item.tooltip : ''}
-                        disabled={!isDisabled}
-                      >
+                      {isDisabled ? (
+                        <Tippy content={item.tooltip}>
+                          <div className={commonClasses}>
+                            {isActive && (
+                              <motion.div
+                                layoutId="active-nav"
+                                className="absolute inset-0 bg-blue-50 rounded-xl"
+                                initial={false}
+                                transition={{
+                                  type: 'spring',
+                                  stiffness: 500,
+                                  damping: 30,
+                                }}
+                              />
+                            )}
+                            <Icon className="w-5 h-5 relative z-10" />
+                            <span className="relative z-10">{item.label}</span>
+                          </div>
+                        </Tippy>
+                      ) : (
                         <Link
                           to={item.path}
-                          className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors relative cursor-pointer
-                            ${
-                              isDisabled
-                                ? 'text-gray-400'
-                                : 'text-gray-600 hover:text-blue-600'
-                            }`}
-                          onClick={() => {
-                            if (!isDisabled) {
-                              setIsOpen(false);
-                            }
-                          }}
+                          onClick={() => setIsOpen(false)}
+                          className={commonClasses}
                         >
-                          {isActive && !isDisabled && (
+                          {isActive && (
                             <motion.div
                               layoutId="active-nav"
                               className="absolute inset-0 bg-blue-50 rounded-xl"
@@ -139,7 +163,7 @@ export function Navbar() {
                           <Icon className="w-5 h-5 relative z-10" />
                           <span className="relative z-10">{item.label}</span>
                         </Link>
-                      </Tippy>
+                      )}
                     </li>
                   );
                 })}

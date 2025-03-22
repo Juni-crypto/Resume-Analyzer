@@ -22,6 +22,7 @@ import { ExperienceTimeline } from '../components/ExperienceTimeline';
 import { KeywordCloud } from '../components/KeywordCloud';
 import { LoginModal } from '../components/auth/LoginModal';
 import { UpgradeModal } from '../components/UpgradeModal';
+import { LoadingProgress } from '../components/LoadingProgress';
 
 const METRIC_ICONS = {
   'Technical Skills': Code2,
@@ -33,13 +34,24 @@ const METRIC_ICONS = {
 export function AnalysisPage() {
   const { user } = useAuth();
   const { selectedRole, metrics } = useResumeAnalysis();
-  const { data: roleData, name: roleName, profile } = selectedRole;
+  const { data: roleData, name: roleName, profile } = selectedRole || {};
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showLoadingProgress, setShowLoadingProgress] = useState(true);
 
   const handleUpgrade = () => {
     setShowUpgradeModal(false);
     setShowLoginModal(true);
+  };
+
+  const handleLoadingComplete = () => {
+    setShowLoadingProgress(false);
+  };
+
+  const shouldShowLoading = () => {
+    const jobsData = localStorage.getItem('jobsData');
+    const sharableResume = localStorage.getItem('sharableResume');
+    return !(jobsData && sharableResume);
   };
 
   const renderLockedOverlay = (children: React.ReactNode) => {
@@ -61,6 +73,22 @@ export function AnalysisPage() {
     );
   };
 
+  if (!selectedRole) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6 flex items-center justify-center">
+        <div className="text-center">
+          <Brain className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            No Analysis Found
+          </h2>
+          <p className="text-gray-600">
+            Please analyze your resume first to see detailed insights.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
       <UpgradeModal
@@ -74,6 +102,10 @@ export function AnalysisPage() {
         onClose={() => setShowLoginModal(false)}
         onSuccess={() => {}}
       />
+
+      {user && showLoadingProgress && shouldShowLoading() && (
+        <LoadingProgress onComplete={handleLoadingComplete} />
+      )}
 
       <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
         <ProfileHeader

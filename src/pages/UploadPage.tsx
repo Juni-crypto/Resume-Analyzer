@@ -14,6 +14,10 @@ import { LoginButton } from '../components/auth/LoginButton';
 import { Toast } from '../components/Toast';
 import { UpgradeModal } from '../components/UpgradeModal';
 import { useAuth } from '../contexts/AuthContext';
+import { BlogSection } from '../components/BlogSection';
+import { PortfolioShowcase } from '../components/features/PortfolioShowcase';
+import { JobsPreview } from '../components/features/JobsPreview';
+
 
 export function UploadPage() {
   const { user } = useAuth();
@@ -26,7 +30,11 @@ export function UploadPage() {
     isLoading,
     error,
     showUpgradeModal,
+    showSuccessToast,
+    showErrorToast,
     setShowUpgradeModal,
+    setShowSuccessToast,
+    setShowErrorToast,
   } = useResumeUpload();
 
   const [showLoginModal, setShowLoginModal] = React.useState(false);
@@ -41,11 +49,24 @@ export function UploadPage() {
     <>
       {isLoading && <LoadingExperience />}
 
-      <Toast
-        message="Analysis complete! Scroll down to see your results."
-        isVisible={showToast}
-        onClose={() => setShowToast(false)}
-      />
+      {user ? (
+        <Toast
+          message="Analysis Complete! 🎉"
+          description="Your curated jobs are being prepared. You'll be redirected to view your detailed analysis shortly."
+          isVisible={showSuccessToast}
+          onClose={() => setShowSuccessToast(false)}
+          type="success"
+        />
+      ) : (
+        <Toast
+          message="Want More Insights? 🚀"
+          description="Sign in to unlock personalized job matches and detailed analysis of your resume."
+          isVisible={showErrorToast}
+          onClose={() => setShowErrorToast(false)}
+          type="loading"
+        />
+      )}
+
 
       <LoginModal
         isOpen={showLoginModal}
@@ -70,13 +91,22 @@ export function UploadPage() {
               className="text-center max-w-4xl mx-auto"
             >
               <h1 className="text-5xl font-bold text-gray-900 mb-6">
-                ChumaOruWorks AI Resume Analyzer
+                More Than Just Resume Analysis
               </h1>
-              <p className="text-xl text-gray-700 leading-relaxed">
-                Analyze your resume with the power of AI to stand out in the
-                competition. Find matching jobs instantly, saving hours of time
-                and boosting your career transition.
+              <p className="text-xl text-gray-700 leading-relaxed mb-4">
+                Upload your resume to unlock a complete career enhancement suite. Get AI-powered resume analysis, 
+                create a stunning portfolio, and discover fresh job matches updated daily.
               </p>
+              <div className="flex items-center justify-center gap-4 text-sm text-gray-600">
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                  Latest jobs from last 3 days
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                  Instant portfolio creation
+                </span>
+              </div>
             </motion.div>
           </div>
         </div>
@@ -131,6 +161,34 @@ export function UploadPage() {
                 <FileUp className="w-6 h-6" />
                 Analyze Resume
               </motion.button>
+            </motion.div>
+          </section>
+
+          <section className="mb-32">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="bg-white/80 backdrop-blur-lg rounded-3xl p-8 border border-white/20"
+            >
+              <PortfolioShowcase onSignInClick={() => setShowLoginModal(true)} />
+            </motion.div>
+          </section>
+
+          <section className="mb-32">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="bg-white/80 backdrop-blur-lg rounded-3xl p-8 border border-white/20"
+            >
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">Fresh Job Matches Daily</h2>
+                <p className="text-lg text-gray-600">
+                  Get personalized job recommendations based on your resume, updated every 3 days
+                </p>
+              </div>
+              <JobsPreview onSignInClick={() => setShowLoginModal(true)} />
             </motion.div>
           </section>
 
