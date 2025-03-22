@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FileUp } from 'lucide-react';
+import { FileUp, Moon, Sun } from 'lucide-react';
 import { SharableResume } from '../components/portfolio/SharableResume';
 
 export function PublicResumePage() {
@@ -9,6 +9,10 @@ export function PublicResumePage() {
   const [resumeData, setResumeData] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
+  const [isDarkMode, setIsDarkMode] = React.useState(() => {
+    const saved = localStorage.getItem('theme');
+    return saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  });
 
   React.useEffect(() => {
     const fetchResume = async () => {
@@ -27,6 +31,29 @@ export function PublicResumePage() {
     if (userId) fetchResume();
   }, [userId]);
 
+  React.useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDarkMode);
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
+
+  // Theme toggle button component
+  const ThemeToggle = () => (
+    <motion.button
+      onClick={() => setIsDarkMode(!isDarkMode)}
+      className="fixed top-8 right-8 z-50 p-3 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 shadow-lg
+                 dark:bg-gray-800/50 dark:border-gray-700/50 hover:scale-110 transition-all"
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      aria-label="Toggle theme"
+    >
+      {isDarkMode ? (
+        <Sun className="w-5 h-5 text-yellow-400" />
+      ) : (
+        <Moon className="w-5 h-5 text-gray-600" />
+      )}
+    </motion.button>
+  );
+
   // Add the "Create Your Own" floating button
   const CreateYourOwnButton = () => (
     <motion.a
@@ -44,29 +71,32 @@ export function PublicResumePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center dark:bg-gray-900 transition-colors duration-200">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
         <CreateYourOwnButton />
+        <ThemeToggle />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center dark:bg-gray-900 transition-colors duration-200">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Resume Not Found</h1>
-          <p className="text-gray-600">This resume may have been removed or is no longer available.</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Resume Not Found</h1>
+          <p className="text-gray-600 dark:text-gray-400">This resume may have been removed or is no longer available.</p>
         </div>
         <CreateYourOwnButton />
+        <ThemeToggle />
       </div>
     );
   }
 
   return (
-    <>
-      <SharableResume data={resumeData} />
+    <div className="dark:bg-gray-900 transition-colors duration-200">
+      <SharableResume data={resumeData} isDarkMode={isDarkMode} />
       <CreateYourOwnButton />
-    </>
+      <ThemeToggle />
+    </div>
   );
 }
