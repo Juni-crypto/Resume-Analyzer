@@ -58,6 +58,7 @@ export default function App() {
         <Layout>
           <Routes>
             <Route path="/" element={<UploadPage />} />
+            {/* Analysis page is now publicly accessible */}
             <Route path="/analysis" element={<AnalysisPage />} />
             <Route path="/blog" element={<BlogListPage />} />
             <Route path="/blog/:slug" element={<BlogPage />} />
