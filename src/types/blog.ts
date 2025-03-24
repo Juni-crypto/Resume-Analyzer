@@ -1,4 +1,4 @@
-export interface BlogSection {
+interface BlogSection {
   title?: string;
   content?: string[];
   list?: string[];
@@ -8,7 +8,7 @@ export interface BlogContent {
   sections: BlogSection[];
 }
 
-export interface BlogPost {
+interface BlogPost {
   slug: string;
   title: string;
   category: string;

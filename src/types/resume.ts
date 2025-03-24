@@ -1,24 +1,24 @@
-export interface ResumeMetric {
+interface ResumeMetric {
   metric_name: string;
   score: number;
   category: string;
   importance: number;
 }
 
-export interface RoleComparison {
+interface RoleComparison {
   compared_role: string;
   similarity_index: number;
   key_matches: string[];
   skill_gaps: string[];
 }
 
-export interface SalaryRange {
+interface SalaryRange {
   min: number;
   max: number;
   currency: string;
 }
 
-export interface MarketInsights {
+interface MarketInsights {
   demand_score: number;
   salary_range: SalaryRange;
   growth_potential: number;
@@ -26,7 +26,7 @@ export interface MarketInsights {
   emerging_skills: string[];
 }
 
-export interface RoleSpecificMetrics {
+interface RoleSpecificMetrics {
   technical_skills: number;
   soft_skills: number;
   experience_match: number;
@@ -39,12 +39,12 @@ export interface RoleSpecificMetrics {
   domain_expertise: number;
 }
 
-export interface ATSScore {
+interface ATSScore {
   overall: number;
   by_role_specific_metrics: RoleSpecificMetrics;
 }
 
-export interface InfographicData {
+interface InfographicData {
   metric_distribution: ResumeMetric[];
   role_comparison: RoleComparison[];
   skill_radar: Record<string, number>;
@@ -53,7 +53,7 @@ export interface InfographicData {
   industry_alignment: Record<string, number>;
 }
 
-export interface RoleAnalysis {
+interface RoleAnalysis {
   ats_score: ATSScore;
   strengths: string[];
   weaknesses: string[];

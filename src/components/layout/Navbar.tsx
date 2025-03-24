@@ -9,8 +9,9 @@ import {
   User,
   Menu,
   X,
-  Book, // Import the icon for the Blog section
-  Contact, // Import the icon for the Portfolio section
+  Book,
+  Contact,
+  FileEdit
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useReportStatus } from '../../hooks/useReportStatus';
@@ -36,18 +37,15 @@ export function Navbar() {
       label: 'Your Analysis',
       icon: BarChart2,
       requiresReport: true,
-      tooltip:
-        'Please wait for your analysis or resubmit your resume if new-user.',
+      tooltip: 'Please wait for your analysis or resubmit your resume if new-user.',
     },
     {
       path: '/jobs',
       label: 'Featured Jobs',
       icon: Briefcase,
       requiresJobs: true,
-      tooltip:
-        'Please wait for your analysis or resubmit your resume if new-user.',
+      tooltip: 'Please wait for your analysis or resubmit your resume if new-user.',
     },
-    // Add the Blog section
     {
       path: '/blog',
       label: 'Blog',
@@ -59,9 +57,13 @@ export function Navbar() {
       label: 'Portfolio',
       icon: Contact,
       alwaysShow: true,
-      tooltip:
-      'Please wait for your analysis or resubmit your resume if new-user.',
-
+      tooltip: 'Please wait for your analysis or resubmit your resume if new-user.',
+    },
+    {
+      path: '/resume-creator',
+      label: 'Resume Creator',
+      icon: FileEdit,
+      alwaysShow: true,
     },
   ];
 

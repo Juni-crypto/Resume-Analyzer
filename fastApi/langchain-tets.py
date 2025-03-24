@@ -669,18 +669,206 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
     finally:
         await websocket.close()
 
+def normalize_location_with_ai(location_data: dict) -> str:
+    """
+    Uses Gemini AI to normalize location data into a supported job search location.
+    """
+    # Country code to name mapping
+    country_codes = {
+        'NL': 'netherlands',
+        'GB': 'uk',
+        'UK': 'uk',
+        'US': 'usa',
+        'AE': 'united arab emirates',
+        'AR': 'argentina',
+        'AU': 'australia',
+        'AT': 'austria',
+        'BH': 'bahrain',
+        'BE': 'belgium',
+        'BR': 'brazil',
+        'CA': 'canada',
+        'CL': 'chile',
+        'CN': 'china',
+        'CO': 'colombia',
+        'CR': 'costa rica',
+        'CZ': 'czech republic',
+        'DK': 'denmark',
+        'EC': 'ecuador',
+        'EG': 'egypt',
+        'FI': 'finland',
+        'FR': 'france',
+        'DE': 'germany',
+        'GR': 'greece',
+        'HK': 'hong kong',
+        'HU': 'hungary',
+        'IN': 'india',
+        'ID': 'indonesia',
+        'IE': 'ireland',
+        'IL': 'israel',
+        'IT': 'italy',
+        'JP': 'japan',
+        'KW': 'kuwait',
+        'LU': 'luxembourg',
+        'MY': 'malaysia',
+        'MX': 'mexico',
+        'MA': 'morocco',
+        'NZ': 'new zealand',
+        'NG': 'nigeria',
+        'NO': 'norway',
+        'OM': 'oman',
+        'PK': 'pakistan',
+        'PA': 'panama',
+        'PE': 'peru',
+        'PH': 'philippines',
+        'PL': 'poland',
+        'PT': 'portugal',
+        'QA': 'qatar',
+        'RO': 'romania',
+        'SA': 'saudi arabia',
+        'SG': 'singapore',
+        'ZA': 'south africa',
+        'KR': 'south korea',
+        'ES': 'spain',
+        'SE': 'sweden',
+        'CH': 'switzerland',
+        'TW': 'taiwan',
+        'TH': 'thailand',
+        'TR': 'turkey',
+        'UA': 'ukraine',
+        'UY': 'uruguay',
+        'VE': 'venezuela',
+        'VN': 'vietnam'
+    }
+
+    valid_locations = [
+        "argentina", "australia", "austria", "bahrain", "belgium", "brazil", 
+        "canada", "chile", "china", "colombia", "costa rica", "czech republic", 
+        "denmark", "ecuador", "egypt", "finland", "france", "germany", "greece", 
+        "hong kong", "hungary", "india", "indonesia", "ireland", "israel", "italy", 
+        "japan", "kuwait", "luxembourg", "malaysia", "mexico", "morocco", "netherlands", 
+        "new zealand", "nigeria", "norway", "oman", "pakistan", "panama", "peru", 
+        "philippines", "poland", "portugal", "qatar", "romania", "saudi arabia", 
+        "singapore", "south africa", "south korea", "spain", "sweden", "switzerland", 
+        "taiwan", "thailand", "turkey", "ukraine", "united arab emirates", "uk", 
+        "usa", "uruguay", "venezuela", "vietnam"
+    ]
+
+    try:
+        # First try to match by country code
+        country_code = location_data.get('country', '').upper()
+        if country_code in country_codes:
+            normalized_location = country_codes[country_code]
+            print(f"Matched country code {country_code} to {normalized_location}")
+            return normalized_location
+
+        # If no direct match, use AI to determine the location
+        prompt = f"""
+        Given the following location data:
+        {json.dumps(location_data, indent=2)}
+        
+        Return exactly one location from this list that best matches the input location:
+        {json.dumps(valid_locations, indent=2)}
+        
+        Rules:
+        1. If the location is in the United States, return "usa"
+        2. If the location is in the United Kingdom, return "uk"
+        3. Match the country name exactly as it appears in the list
+        4. Return only the location string, no additional text or explanation
+        5. If no close match is found, return "worldwide"
+        """
+
+        def _normalize_operation():
+            model = genai.GenerativeModel(model_name="gemini-2.0-flash-exp")
+            response = model.generate_content(prompt)
+            return response.text.strip().lower()
+        
+        # Use fallback mechanism for AI operation
+        normalized_location = try_with_fallback_keys(_normalize_operation)
+        print(f"AI suggested location: {normalized_location}")
+        
+        # Validate response is in valid_locations
+        if normalized_location not in valid_locations:
+            print(f"Location {normalized_location} not in valid locations, defaulting to worldwide")
+            return "worldwide"
+            
+        return normalized_location
+
+    except Exception as e:
+        print(f"Error normalizing location: {e}")
+        return "worldwide"
+
+def get_location_from_ip(ip: str) -> str:
+    try:
+        response = requests.get(f"https://ipinfo.io/{ip}/json")
+        location_data = response.json()
+        print(f"Location data: {location_data}")
+        
+        # Use AI to normalize the location
+        normalized_location = normalize_location_with_ai(location_data)
+        print(f"Normalized location: {normalized_location}")
+        return normalized_location
+        
+    except Exception as e:
+        print(f"Error getting location from IP: {e}")
+        return "worldwide"
+
+def generate_google_search_term(role: str, location_data: dict, normalized_location: str) -> str:
+    """
+    Generates a location-aware Google search term for job searching.
+    """
+    try:
+        city = location_data.get('city', '')
+        region = location_data.get('region', '')
+        
+        if normalized_location == 'usa':
+            # For US locations, use city and state if available
+            if city and region:
+                return f"{role} jobs near {city}, {region} since yesterday"
+            return f"{role} jobs in USA since yesterday"
+            
+        elif normalized_location == 'uk':
+            # For UK locations, use city if available
+            if city:
+                return f"{role} jobs in {city}, UK since yesterday"
+            return f"{role} jobs in United Kingdom since yesterday"
+            
+        else:
+            # For other countries, use city and country if available
+            if city:
+                return f"{role} jobs in {city}, {normalized_location} since yesterday"
+            return f"{role} jobs in {normalized_location} since yesterday"
+            
+    except Exception as e:
+        print(f"Error generating Google search term: {e}")
+        return f"{role} jobs since yesterday"
+
 def do_job_search(suitable_roles: List[str], client_id: str, user_id: str, location: str):
     try:
+        # Get full location data for better search terms
+        location_data = {}
+        try:
+            response = requests.get(f"https://ipinfo.io/{location}/json")
+            location_data = response.json()
+        except Exception as e:
+            print(f"Error getting detailed location data: {e}")
+            
+        # Normalize location before job search
+        normalized_location = normalize_location_with_ai({"country": location})
+        
         all_jobs = []
         for s_role in suitable_roles:
+            # Generate location-aware Google search term
+            google_search = generate_google_search_term(s_role, location_data, normalized_location)
+            print(f"Generated Google search term: {google_search}")
+            
             jobs_df = scrape_jobs(
-                site_name=["glassdoor","google","indeed"],
+                site_name=["linkedin", "zip_recruiter", "glassdoor", "google" , "indeed"],
                 search_term=s_role,
-                location=location,
+                google_search_term=google_search,
+                location=normalized_location,
                 results_wanted=20,
                 hours_old=72,
-                country_indeed=location,
-                linkedin_fetch_description=True,
+                country_indeed=normalized_location,
             )
             all_jobs.append(jobs_df)
         
@@ -697,16 +885,6 @@ def do_job_search(suitable_roles: List[str], client_id: str, user_id: str, locat
     except Exception as e:
         job_status[client_id] = {"status": "failed", "message": str(e)}
 
-def get_location_from_ip(ip: str) -> str:
-    try:
-        response = requests.get(f"http://ip-api.com/json/{ip}")
-        data = response.json()
-        print(data)
-        return data.get("country", "India")  # Default to "India" if country is not found
-    except Exception as e:
-        print(f"Error getting location from IP: {e}")
-        return "India"  # Default to "India" in case of error
-
 # === API Endpoints ===
 
 # Initialize user_id counter
@@ -720,10 +898,6 @@ async def analyze_resume(
     user_id: Optional[str] = Form(None, description="User ID for storing responses"),
     background_tasks: BackgroundTasks = None
 ):
-    print("=== Request Headers ===")
-    for header_name, header_value in request.headers.items():
-        print(f"{header_name}: {header_value}")
-    print("=====================")
     
     global user_id_counter
     if user_id is None:

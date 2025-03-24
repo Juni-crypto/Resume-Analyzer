@@ -8,8 +8,6 @@ export function useResumeUpload() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [showSuccessToast, setShowSuccessToast] = useState(false);
-  const [showErrorToast, setShowErrorToast] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -28,14 +26,13 @@ export function useResumeUpload() {
 
     setIsLoading(true);
     setError(null);
-    setShowSuccessToast(false);
-    setShowErrorToast(false);
 
     try {
       const formData = new FormData();
       formData.append('resume', selectedFile);
       formData.append('roles', JSON.stringify([selectedRole]));
 
+      // If user is logged in, include their ID
       if (user) {
         formData.append('user_id', user.uid);
       }
@@ -53,8 +50,10 @@ export function useResumeUpload() {
       }
 
       const analysisData = await response.json();
-      localStorage.setItem('resumeAnalysis', JSON.stringify(analysisData));
 
+      // Store analysis in localStorage
+      localStorage.setItem('resumeAnalysis', JSON.stringify(analysisData));
+      // If user is logged in, fetch their data
       if (user) {
         const atsResponse = await fetch(
           `https://bm7cr2dasm.ap-south-1.awsapprunner.com/ats-response/${user.uid}`
@@ -72,11 +71,9 @@ export function useResumeUpload() {
         localStorage.removeItem('jobsData');
       }
 
-      setShowSuccessToast(true);
-      setTimeout(() => {
-        navigate('/analysis');
-      }, 2000);
+      navigate('/analysis');
 
+      // Show upgrade modal after a delay if user is not logged in
       if (!user) {
         setTimeout(() => {
           setShowUpgradeModal(true);
@@ -87,7 +84,6 @@ export function useResumeUpload() {
       setError(
         error instanceof Error ? error.message : 'An unexpected error occurred'
       );
-      setShowErrorToast(true);
     } finally {
       setIsLoading(false);
     }
@@ -99,11 +95,7 @@ export function useResumeUpload() {
     isLoading,
     error,
     showUpgradeModal,
-    showSuccessToast,
-    showErrorToast,
     setShowUpgradeModal,
-    setShowSuccessToast,
-    setShowErrorToast,
     handleFileUpload,
     handleRoleSelect,
     handleSubmit,
